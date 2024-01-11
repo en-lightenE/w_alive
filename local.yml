@@ -8,108 +8,105 @@ services:
     command: /start
     container_name: django-api
     volumes:
-        - .:/app
-        - static_volume:/app/staticfiles
-        - media_volume:/app/mediafiles
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
     expose:
-        - "8000"
+      - "8000"
     env_file:
-        - ./.envs/.local/.django
-        - ./.envs/.local/.postgres
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
     depends_on:
-        - postgres
-        - mailhog
-        - redis
+      - postgres
+      - mailhog
+      - redis
     networks:
-        - word_alive_api
-  
+      - word_alive_api
+
   postgres:
-      build:
-          context: .
-          dockerfile: ./docker/local/postgres/Dockerfile
-      container_name: postgres
-      volumes:
-          - local_postgres_data:/var/lib/postgresql/data
-          - local_postgres_data_backups:/backups
-      env_file:
-          - ./.envs/.local/.postgres
-      networks:
-          - word_alive_api
-  
+    build:
+      context: .
+      dockerfile: ./docker/local/postgres/Dockerfile
+    container_name: wordalive_postgres
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+    networks:
+      - word_alive_api
+
   mailhog:
-      image: mailhog/mailhog
-      container_name: mailhog
-      ports:
-          - "8025:8025"
-      networks:
-          - word_alive_api
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "8025:8025"
+    networks:
+      - word_alive_api
 
   redis:
-        image: redis:6-alpine
-        container_name: redis
-        networks:
-            - word_alive_api
-  
+    image: redis:6-alpine
+    container_name: redis
+    networks:
+      - word_alive_api
+
   celery_worker:
-        build:
-            context: .
-            dockerfile: ./docker/local/django/Dockerfile
-        command: /start-celeryworker
-        container_name: celery_worker
-        volumes:
-            - .:/app
-        env_file:
-            - ./.envs/.local/.django
-            - ./.envs/.local/.postgres
-        depends_on:
-            - redis
-            - postgres
-            - mailhog
-        networks:
-            - word_alive_api
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    command: /start-celeryworker
+    container_name: celery_worker
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    depends_on:
+      - redis
+      - postgres
+      - mailhog
+    networks:
+      - word_alive_api
 
   flower:
-        build:
-            context: .
-            dockerfile: ./docker/local/django/Dockerfile
-        command: /start-flower
-        container_name: flower
-        volumes:
-            - .:/app
-        env_file:
-            - ./.envs/.local/.django
-            - ./.envs/.local/.postgres
-        ports:
-            - "5555:5555"
-        depends_on:
-            - redis
-            - postgres
-        networks:
-            - word_alive_api
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    command: /start-flower
+    container_name: flower
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - word_alive_api
   nginx:
-        restart: always
-        depends_on:
-            - api
-        volumes:
-            - static_volume:/app/staticfiles
-            - media_volume:/app/mediafiles
-        build:
-            context: ./docker/local/nginx
-            dockerfile: Dockerfile
-        ports:
-            - "8080:80"
-        networks:
-            - word_alive_api
-
-
-
+    restart: always
+    depends_on:
+      - api
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    build:
+      context: ./docker/local/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    networks:
+      - word_alive_api
 
 networks:
-   word_alive_api:
-        driver: bridge
+  word_alive_api:
+    driver: bridge
 
 volumes:
-    local_postgres_data: {}
-    local_postgres_data_backups: {}
-    static_volume:
-    media_volume:  
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+  static_volume:
+  media_volume:

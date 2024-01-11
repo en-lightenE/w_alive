@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import environ
+
 from datetime import timedelta
+import environ
 env = environ.Env()
 # Build paths to be in the same directory as manage.py 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
@@ -63,7 +64,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-
+    'core_apps.users',
 
 ]
 
