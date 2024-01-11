@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+
+watchmedo auto-restart -d word_alive_api/ -p '*.py' -- celery -A word_alive_api worker --loglevel=info
