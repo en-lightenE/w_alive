@@ -2,7 +2,8 @@ import pytest
 from pytest_factoryboy import register
 
 from core_apps.users.tests.factories import UserFactory
-# from core_apps.accounts.tests.factories import (AccountFactory, 
+
+# from core_apps.accounts.tests.factories import (AccountFactory,
 #                                                 TermFactory,
 #                                                 PermissionFactory,
 #                                                 AccountPermissionFactory,
@@ -14,10 +15,17 @@ register(UserFactory)
 # register(AccountPermissionFactory)
 # register(AccountFactory)
 
+
 @pytest.fixture
-def baseUser(db, user_factory):
-    user_name = user_factory.create()
-    return user_name
+def base_user(db, user_factory):
+    return user_factory.create()
+
+
+@pytest.fixture
+def super_user(db, user_factory):
+    new_user = user_factory.create(is_staff=True, is_superuser=True)
+    return new_user
+
 
 # @pytest.fixture
 # def baseTerm(db, term_factory):
@@ -38,7 +46,7 @@ def baseUser(db, user_factory):
 # def test_user(db, user_factory):
 #     user = user_factory.create()
 #     yield user
-    
+
 # @pytest.fixture
 # def baeAccount(db, account_factory):
 #     account = account_factory.create(test_user)

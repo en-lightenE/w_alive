@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from faker import Factory as FakerFactory
 
 faker = FakerFactory.create()
-User = get_user_model()
+
 
 @factory.django.mute_signals(post_save)
 class UserFactory(factory.django.DjangoModelFactory):
@@ -13,6 +13,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     Args:
         factory (_type_): _description_
     """
+
     first_name = factory.LazyAttribute(lambda x: faker.first_name())
     last_name = factory.LazyAttribute(lambda x: faker.last_name())
     username = factory.LazyAttribute(lambda x: faker.first_name().lower())
@@ -20,14 +21,13 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.LazyAttribute(lambda x: faker.password())
     is_active = True
     is_staff = False
-    
+
     class Meta:
-        model = User
-           
+        model = get_user_model()
+
     @classmethod
-    def _create(cls, models_class, *args, **kwargs):
-        manager = cls._get_manager(models_class)
-        if "is_superuser" in kwargs:
+    def _create(cls, model_class, *args, **kwargs):
+        manager = cls._get_manager(model_class)
+        if kwargs.get("is_superuser"):
             return manager.create_superuser(*args, **kwargs)
-        
-    
+        return manager.create_user(*args, **kwargs)
